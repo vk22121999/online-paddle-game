@@ -1,5 +1,11 @@
 <html>
+  <head>
+    <meta charset="utf-8">
+    <title>Paddle</title>
 
+  </head>
+<body>
+ 
 <canvas id="gameCanvas" width="800" height="600"></canvas>
 <script>
 
@@ -20,83 +26,83 @@ var  ballY = getRandomArbitrary(100,500);
  const PADDLE_HEIGHT = 100;
  function computerMovement()
  {  var paddle2YCenter = paddle2Y+(PADDLE_HEIGHT/2);
- 	if(paddle2YCenter < ballY-35)
- 	{
- 		paddle2Y +=8;
+  if(paddle2YCenter < ballY-35)
+  {
+    paddle2Y +=8;
         
- 	}
- 	else if(paddle2YCenter > ballY+35)
- 	{
- 		paddle2Y -=8;
- 	}
+  }
+  else if(paddle2YCenter > ballY+35)
+  {
+    paddle2Y -=8;
+  }
  }
  function calculateMousePos(evt)
  {
- 	var rect = canvas.getBoundingClientRect();
- 	var root = document.documentElement;
- 	var mouseX = evt.clientX - rect.left - root.scrollLeft;
- 	var mouseY = evt.clientY - rect.top - root.scrollTop;
- 	return{
- 		x:mouseX,
- 		y:mouseY
- 	}
+  var rect = canvas.getBoundingClientRect();
+  var root = document.documentElement;
+  var mouseX = evt.clientX - rect.left - root.scrollLeft;
+  var mouseY = evt.clientY - rect.top - root.scrollTop;
+  return{
+    x:mouseX,
+    y:mouseY
+  }
  }
 
   window.onload = function()
   {   console.log("heelo world");
-  	  canvas = document.getElementById('gameCanvas');
-  	  canvasContext = canvas.getContext('2d');
-  	  var framesPerSecond = 30;
-  	  
-  	  
-  	  	setInterval(function(){
-  	  		if(flag)
+      canvas = document.getElementById('gameCanvas');
+      canvasContext = canvas.getContext('2d');
+      var framesPerSecond = 30;
+      
+      
+        setInterval(function(){
+          if(flag)
              {moveEverything();}
         
             drawEverything();
-	 },1000/framesPerSecond);
-  	  
-  	  	
-  	  	
-  	  		canvas.addEventListener('mousemove',
-  	  	function(evt){
-  	  		var  mousePos = calculateMousePos(evt);
-  	  		paddle1Y = mousePos.y - (PADDLE_HEIGHT/2);
-  	  	});
-  	  
-  	  	
-  	   	  window.addEventListener('keyup',
-  	   	  	function(event)
-  	   	  	{
-  	   	  		if(event.keyCode===32)
-  	   	  			{flag=true;yourScore=compScore=0;}
-  	   	  		
+   },1000/framesPerSecond);
+      
+        
+        
+          canvas.addEventListener('mousemove',
+        function(evt){
+          var  mousePos = calculateMousePos(evt);
+          paddle1Y = mousePos.y - (PADDLE_HEIGHT/2);
+        });
+      
+        
+          window.addEventListener('keyup',
+            function(event)
+            {
+              if(event.keyCode===32)
+                {flag=true;yourScore=compScore=0;}
+              
 
-  	   	  	});
-  	   	  
+            });
+          
 
   }
   function getRandomArbitrary(min, max) {
   return Math.random() * (max - min) + min;
 }
-	
-	function ballReset()
-	{   
-          flag=false;	
+  
+  function ballReset()
+  {   
+          flag=false; 
 
-	  
+    
      ballSpeedX = -10;ballSpeedY = getRandomArbitrary(-2,5);
-		ballX = canvas.width/2;
-		ballY = getRandomArbitrary(100,canvas.height-100);
-	}
+    ballX = canvas.width/2;
+    ballY = getRandomArbitrary(100,canvas.height-100);
+  }
 
   function moveEverything()
   {   computerMovement();
-  	ballX = ballX + ballSpeedX;
-  	ballY = ballY + ballSpeedY;
-  	if(ballX < 1)
-  	{   if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT)
-  		{
+    ballX = ballX + ballSpeedX;
+    ballY = ballY + ballSpeedY;
+    if(ballX < 1)
+    {   if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT)
+      {
            ballSpeedX = -ballSpeedX;
            var deltaY = ballY -(paddle1Y+PADDLE_HEIGHT/2);
            if(deltaY != 0)
@@ -105,55 +111,55 @@ var  ballY = getRandomArbitrary(100,500);
            }
            
 
-  		}
-  		else
-  		{   
-  			yourScore--;
-  		ballReset();	
-  		}
-  		
-  	}
-  	
-  	if(ballX > canvas.width-1)
-  	{   if(ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT)
-  		{
-  			ballSpeedX = -ballSpeedX;
-  			var deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
+      }
+      else
+      {   
+        yourScore--;
+      ballReset();  
+      }
+      
+    }
+    
+    if(ballX > canvas.width-1)
+    {   if(ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT)
+      {
+        ballSpeedX = -ballSpeedX;
+        var deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
            if(deltaY != 0)
            {
               ballSpeedY = deltaY*0.35;
            }
-  		}
-  		else
-  		{    compScore--;
-  			ballReset();
-  		}
-  	}
-  	if(ballY > canvas.height || ballY <0)
-  	{
-  		ballSpeedY = -ballSpeedY;
-  	}
+      }
+      else
+      {    compScore--;
+        ballReset();
+      }
+    }
+    if(ballY > canvas.height || ballY <0)
+    {
+      ballSpeedY = -ballSpeedY;
+    }
   }
 
   function drawNet()
   {
-  	for(var i=0 ; i < canvas.height;i+=40)
-  	{
-  		colorRect((canvas.width/2)-1,i,2,20,'white');
-  	}
+    for(var i=0 ; i < canvas.height;i+=40)
+    {
+      colorRect((canvas.width/2)-1,i,2,20,'white');
+    }
   }
   function drawEverything()
   {   
-  	//console.log(ballX);  
-  	 
-  	 colorRect(0,0,canvas.width,canvas.height,'black');
-  	 colorRect(0,paddle1Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
-  	 colorRect(canvas.width-PADDLE_THICKNESS,paddle2Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
+    //console.log(ballX);  
+     
+     colorRect(0,0,canvas.width,canvas.height,'black');
+     colorRect(0,paddle1Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
+     colorRect(canvas.width-PADDLE_THICKNESS,paddle2Y,PADDLE_THICKNESS,PADDLE_HEIGHT,'white');
  
            if(flag)
            {
-           	colorCircle(ballX,ballY,8,'white');
-           	drawNet();
+            colorCircle(ballX,ballY,8,'white');
+            drawNet();
            }
            else if(yourScore<0 && !flag)
            { canvasContext.font = "20px Verdana";
@@ -161,7 +167,7 @@ var  ballY = getRandomArbitrary(100,500);
            }
            else if(compScore<0 && !flag)
            { canvasContext.font = "30px Verdana";
-           	var gradient = canvasContext.createLinearGradient(0, 0, canvas.width, 0);
+            var gradient = canvasContext.createLinearGradient(0, 0, canvas.width, 0);
                         gradient.addColorStop("0"," magenta");
                        gradient.addColorStop("0.5", "blue");
                      gradient.addColorStop("1.0", "red");
@@ -175,19 +181,21 @@ var  ballY = getRandomArbitrary(100,500);
 
   function colorCircle(centerX,centerY,radius,drawColor)
   {   canvasContext.fillStyle = drawColor;
-  	canvasContext.beginPath();
-  	canvasContext.arc(centerX,centerY,radius,0,Math.PI*2,true);
-  	
-  	canvasContext.fill();
-  	
+    canvasContext.beginPath();
+    canvasContext.arc(centerX,centerY,radius,0,Math.PI*2,true);
+    
+    canvasContext.fill();
+    
   }
   function colorRect(leftX,topY,width,height,drawColor)
   {
-  	canvasContext.fillStyle = drawColor;
-  	  canvasContext.fillRect(leftX,topY,width,height);
+    canvasContext.fillStyle = drawColor;
+      canvasContext.fillRect(leftX,topY,width,height);
 
   }
-	
-</script>
+  
+</script> 
+</body>
+
 
 </html>
