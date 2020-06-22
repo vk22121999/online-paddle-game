@@ -1,4 +1,6 @@
-
+var { name } = Qs.parse(location.search, {
+  ignoreQueryPrefix: true
+});
 var canvas;
 var canvasContext;
 var ballX = 800 / 2;
@@ -14,7 +16,7 @@ var paddle1Y = 250;
 var paddle2Y = 250;
 const PADDLE_THICKNESS = 10;
 const PADDLE_HEIGHT = 100;
-const socket = io.connect("http://localhost:5000");
+const socket = io.connect("https://paddle-online.herokuapp.com/");
 
 function calculateMousePos(evt) {
   var rect = canvas.getBoundingClientRect();
@@ -30,9 +32,7 @@ function calculateMousePos(evt) {
 window.onload = function () {
   console.log("heelo world");
 
-  var { name } = Qs.parse(location.search, {
-    ignoreQueryPrefix: true
-  });
+  
   console.log(name)
   if (name != undefined && sessionStorage.getItem("name")) {
     alert("player 1")
@@ -42,7 +42,7 @@ window.onload = function () {
     player = 2;
   }
 
-
+ // const socket = io.connect("http://localhost:5000");
   //const socket = io.connect("https://paddlepong.herokuapp.com");
 
 
@@ -57,7 +57,7 @@ window.onload = function () {
       console.log(ballX,ballY);
     }
   
-    console.log("vaa da")
+   // console.log("vaa da")
   });
 
   socket.on('changeMade1', (data) => {
@@ -71,13 +71,27 @@ window.onload = function () {
     if (player === 1)
       paddle2Y = data.paddle2Y;
   });
+  socket.on('game-reset-recieve', (data) => {
+    
+    
+        flag = data.flag;
+      player1Score = data.player1Score;
+      player2Score = data.player2Score;
+      ballSpeedX =data.ballSpeedX;
+      ballSpeedY = data.ballSpeedY;
+      ballX = data.ballX;
+      ballY = data.ballY
+      
+  });
 
   socket.on('change-arb-recieve', (data) => {
     if (player === 1)
     {
-      ballY = data.ballY;
+      
       flag = data.flag;
-      ballSpeedY = data.ballSpeedY;
+      player1Score = data.player1Score;
+      player2Score = data.player2Score;
+     
       
     }
     
@@ -109,7 +123,7 @@ window.onload = function () {
         if (event.keyCode === 32) {
           flag = true;
           player1Score = player2Score = 0;
-          socket.emit('change-arb', { ballY, ballSpeedY, flag, name });
+          socket.emit('change-arb', { flag, name ,player1Score,player2Score});
 
         }
       });
@@ -121,16 +135,18 @@ function getRandomArbitrary(min, max) {
 }
 
 function ballReset() {
+  
   flag = false;
   ballSpeedX = 10;
   ballSpeedY = getRandomArbitrary(-2, 5);
   ballX = canvas.width / 2;
   ballY = getRandomArbitrary(100, canvas.height - 100);
+  socket.emit("game-reset",{name,flag,ballSpeedX,ballSpeedY,ballX,ballY,player1Score,player2Score});
 }
 
 function moveEverything() {
   // computerMovement();
-  
+  //const socket1 = io.connect("http://localhost:5000");
   if(player===2)
   {
     

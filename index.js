@@ -1,13 +1,7 @@
 const express = require('express')
 const app = express();
 app.use(express.static('public'));
-const redis = require("redis");
-let redisClient;
-if (process.env.REDIS_URL) {
-  redisClient = redis.createClient(process.env.REDIS_URL)
-} else {
-  redisClient = redis.createClient()
-}
+
 const port = process.env.PORT || 5000;
 
 var server = app.listen(port, () => {
@@ -59,6 +53,9 @@ io.on("connection", socket => {
   socket.on("ball-every",data =>{
    
     io.to(data.name).emit("ball", data);
+  });
+  socket.on("game-reset", data => {
+    io.to(data.name).emit("game-reset-recieve", data)
   });
 
 });
