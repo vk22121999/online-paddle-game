@@ -155,7 +155,7 @@ function moveEverything() {
     ballY = ballY + ballSpeedY;
   } 
 
-  
+
   
    
   
