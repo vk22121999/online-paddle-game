@@ -16,7 +16,7 @@ var paddle1Y = 250;
 var paddle2Y = 250;
 const PADDLE_THICKNESS = 10;
 const PADDLE_HEIGHT = 100;
-const socket = io.connect("https://paddle-online.herokuapp.com/");
+const socket = io.connect("http://localhost:5000");
 
 function calculateMousePos(evt) {
   var rect = canvas.getBoundingClientRect();
@@ -28,16 +28,24 @@ function calculateMousePos(evt) {
     y: mouseY
   }
 }
-
+var room = sessionStorage.getItem("name");
 window.onload = function () {
   console.log("heelo world");
 
   
-  console.log(name)
-  if (name != undefined && sessionStorage.getItem("name")) {
-    alert("player 1")
+  //console.log(name)
+  if (room) {
+    alert("player 1");
+    
+  socket.emit('join', room);
   } else {
-    alert("player 2")
+    let second ;
+    while(second==undefined||second=="")
+      second = prompt("Enter room name").trim();
+    room = second;
+    socket.emit('join',second);
+    alert("player 2");
+
     
     player = 2;
   }
@@ -46,7 +54,6 @@ window.onload = function () {
   //const socket = io.connect("https://paddlepong.herokuapp.com");
 
 
-  socket.emit('join', name);
 
   socket.on('ball', (data) => {
     if(player === 1)
@@ -54,22 +61,21 @@ window.onload = function () {
      
       ballX = data.ballX;
       ballY = data.ballY;
-      console.log(ballX,ballY);
+      //console.log(ballX,ballY);
     }
   
    // console.log("vaa da")
   });
 
-  socket.on('changeMade1', (data) => {
-    if (player === 2)
-      paddle1Y = data.paddle1Y;
-     // console.log("lolololololi");
-  });
 
-  socket.on('changeMade2', (data) => {
+
+  socket.on('changeMade', (data) => {
     
     if (player === 1)
       paddle2Y = data.paddle2Y;
+
+    if (player === 2)
+      paddle1Y = data.paddle1Y;
   });
   socket.on('game-reset-recieve', (data) => {
     
@@ -111,10 +117,10 @@ window.onload = function () {
       var mousePos = calculateMousePos(evt);
       if (player === 1) {
         paddle1Y = mousePos.y - (PADDLE_HEIGHT / 2);
-        socket.emit('change1', { paddle1Y, player, name })
+        socket.emit('change', { paddle1Y, player, room })
       } else if (player === 2) {
         paddle2Y = mousePos.y - (PADDLE_HEIGHT / 2);
-        socket.emit('change2', { paddle2Y, player, name })
+        socket.emit('change', { paddle2Y, player, room })
       }
     });
   if (flag == false && player === 2) {
@@ -123,7 +129,7 @@ window.onload = function () {
         if (event.keyCode === 32) {
           flag = true;
           player1Score = player2Score = 0;
-          socket.emit('change-arb', { flag, name ,player1Score,player2Score});
+          socket.emit('change-arb', { flag,room ,player1Score,player2Score});
 
         }
       });
@@ -141,7 +147,7 @@ function ballReset() {
   ballSpeedY = getRandomArbitrary(-2, 5);
   ballX = canvas.width / 2;
   ballY = getRandomArbitrary(100, canvas.height - 100);
-  socket.emit("game-reset",{name,flag,ballSpeedX,ballSpeedY,ballX,ballY,player1Score,player2Score});
+  socket.emit("game-reset",{room,flag,ballSpeedX,ballSpeedY,ballX,ballY,player1Score,player2Score});
 }
 
 function moveEverything() {
@@ -150,47 +156,19 @@ function moveEverything() {
   if(player===2)
   {
     
-    socket.emit("ball-every",{ballX,ballY,name});
+    socket.emit("ball-every",{ballX,ballY,room});
     ballX = ballX + ballSpeedX;
     ballY = ballY + ballSpeedY;
   } 
 
 
-  
-   
-  
-
   if (ballX < 1) {
     if (ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT) {
       ballSpeedX = -ballSpeedX;
-   //  if (player === 1) {
+   
       var deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2);
       ballSpeedY = deltaY * 0.35;
-     // socket.emit("change-ball1", { ballSpeedY, name, ballX, ballY });
-    //   }
-      // if(player === 2)
-      // {
-      //   axios.get('/get1')
-      //   .then(function (res) {
-      //    // let res = JSON.parse(response);
-      //     console.log(res,"1");
-      //     if(res.data=="")
-      //     {
-      //       ballSpeedY=ballSpeedY;
-      //       ballX = ballX;
-      //       ballY = ballY;
-      //     }
-      //     else
-      //     {
-      //       ballSpeedY=res.data.ballSpeedY;
-      //      // ballX = res.data.ballX;
-      //      // ballY = res.data.ballY;
-            
-      //     }
-         
-      //   })
-        
-      // }
+     
     }
     else {
       player1Score--;
@@ -201,34 +179,10 @@ function moveEverything() {
   if (ballX > canvas.width - 1) {
     if (ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT) {
       ballSpeedX = -ballSpeedX;
-    //  if (player === 2) {
+    
       var deltaY = ballY - (paddle2Y + PADDLE_HEIGHT / 2);
       ballSpeedY = deltaY * 0.35;
-      // socket.emit("change-ball2", { ballSpeedY, name, ballX, ballY });
-      //  }
-      //  if(player === 1)
-      //  {
-      //    axios.get('/get2')
-      //    .then(function (res) {
-      //       //let res = JSON.parse(response);
-      //       if(res.data=="")
-      //     {
-      //       ballSpeedY=ballSpeedY;
-      //       ballX = ballX;
-      //       ballY = ballY;
-      //     }
-      //     else{
-      //       console.log(res,"2");
-      //       ballSpeedY=res.data.ballSpeedY;
-      //      // ballX = res.data.ballX;
-      //      // ballY = res.data.ballY;
-      //     }
-            
-            
-      //    })
-         
-      //  }
-       
+        
     }
     else {
       player2Score--;

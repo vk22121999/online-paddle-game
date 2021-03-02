@@ -34,16 +34,16 @@ var io = require("socket.io")(server);
 io.on("connection", socket => {
 
   socket.on("join", (name) => {
+    console.log("name: ",name);
     socket.join(name);
   });
 
-  socket.on("change1", data => {
-    io.to(data.name).emit("changeMade1", data)
+  socket.on("change", data => {
+   console.log("hio",data);
+    io.to(data.name).emit("changeMade", data)
   });
 
-  socket.on("change2", data => {
-    io.to(data.name).emit("changeMade2", data)
-  });
+
 
   socket.on("change-arb", data => {
     
@@ -59,19 +59,4 @@ io.on("connection", socket => {
   });
 
 });
-
-  // socket.on("change-ball1", data => {
-          
-  //   console.log(JSON.stringify(data),"socket-1");
-  //   redisClient.hset('value1', 1, JSON.stringify(data));
-   
-  // });
-
-  // socket.on("change-ball2", data => {
-        
-  // redisClient.hset('value2', 2, JSON.stringify(data));
-    
-  // });
-
- 
 
