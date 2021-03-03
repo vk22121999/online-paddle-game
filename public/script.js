@@ -10,13 +10,14 @@ var ballSpeedY = getRandomArbitrary(-2, 5);
 var player1Score = 0;
 var player2Score = 0;
 var flag = false;
-
+var socket;
 var player = 1;
 var paddle1Y = 250;
 var paddle2Y = 250;
 const PADDLE_THICKNESS = 10;
 const PADDLE_HEIGHT = 100;
-const socket = io.connect("http://localhost:5000");
+
+
 
 function calculateMousePos(evt) {
   var rect = canvas.getBoundingClientRect();
@@ -29,6 +30,11 @@ function calculateMousePos(evt) {
   }
 }
 var room = sessionStorage.getItem("name");
+if(room)
+   socket = io.connect("http://localhost:5000");
+else
+   socket = io.connect("http://192.168.1.4:5000")
+var second = ""
 window.onload = function () {
   console.log("heelo world");
 
@@ -37,13 +43,13 @@ window.onload = function () {
   if (room) {
     alert("player 1");
     
-  socket.emit('join', room);
+  socket.emit('join', {name:room,player:1});
   } else {
-    let second ;
+    
     while(second==undefined||second=="")
       second = prompt("Enter room name").trim();
-    room = second;
-    socket.emit('join',second);
+    console.log("second room:",second)
+    socket.emit('join',{name:second,player:2});
     alert("player 2");
 
     
@@ -56,21 +62,16 @@ window.onload = function () {
 
 
   socket.on('ball', (data) => {
-    if(player === 1)
-    {
-     
+  
       ballX = data.ballX;
       ballY = data.ballY;
-      //console.log(ballX,ballY);
-    }
-  
-   // console.log("vaa da")
+ 
   });
 
 
 
   socket.on('changeMade', (data) => {
-    
+    console.log("data",data);
     if (player === 1)
       paddle2Y = data.paddle2Y;
 
@@ -120,7 +121,7 @@ window.onload = function () {
         socket.emit('change', { paddle1Y, player, room })
       } else if (player === 2) {
         paddle2Y = mousePos.y - (PADDLE_HEIGHT / 2);
-        socket.emit('change', { paddle2Y, player, room })
+        socket.emit('change', { paddle2Y, player,room:second})
       }
     });
   if (flag == false && player === 2) {
@@ -156,7 +157,7 @@ function moveEverything() {
   if(player===2)
   {
     
-    socket.emit("ball-every",{ballX,ballY,room});
+    socket.emit("ball-every",{ballX,ballY,name:room});
     ballX = ballX + ballSpeedX;
     ballY = ballY + ballSpeedY;
   } 

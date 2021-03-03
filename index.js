@@ -28,19 +28,40 @@ var server = app.listen(port, () => {
 //   });
   
 // });
-
+let rooms = {}
 var io = require("socket.io")(server);
 
 io.on("connection", socket => {
 
-  socket.on("join", (name) => {
-    console.log("name: ",name);
-    socket.join(name);
+  socket.on("join", (data) => {
+    //console.log("ji ",data,socket.id)
+    if(rooms[data.name])
+    {
+      if(data.player === 1)
+      rooms[data.name]["player1"] = socket.id; 
+      else
+      rooms[data.name]["player2"] = socket.id;
+    }
+    else
+    {
+      if(data.player === 1)
+      rooms[data.name] = {player1:socket.id,player2:""}
+      else
+      rooms[data.name] = {player2:socket.id,player1:""}
+    
+    }    
+    console.log("hi: ",data.player,"   ",rooms);
+    socket.join(data.name);
   });
 
   socket.on("change", data => {
-   console.log("hio",data);
-    io.to(data.name).emit("changeMade", data)
+   //console.log("hio",data);
+   if(data.player==1)
+   {
+    io.to(rooms[data.room]["player2"]).emit("changeMade",data)
+   }
+   else
+   io.to(rooms[data.room]["player1"]).emit("changeMade",data)
   });
 
 
